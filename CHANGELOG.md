@@ -44,3 +44,6 @@ Setting production release mark. Locking down versions of critical components
 
 0.1.1
 Emitting message on mixin load to allow for deferred execution of code based on loaded mixins
+
+0.1.1a
+Putting file detection insulation on context.$sendfile
