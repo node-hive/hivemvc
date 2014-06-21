@@ -33,21 +33,24 @@ Basic Architectural Concepts
 
 Hive-mvc is built using the follwoing foundational modules:
 
-1) hive-configuration - a system for laoding configuration from JSON files or modules.
-2) Hive-component - a "widget factory" framework for building up a widget based on configuration and mixins. Designed
-   to allow for multiple inputs for both.
-3) Hive-model - Although you'll want a "real"repo for your application data, hive-model is used for internal state
-   keeping inside hive-mvc. ** All internal hive-mvc model names begin with a "$" so you shouldn't see namespace
-   collision.
-4) Hive-loader - to bootstrap the application from the file system Hive-loader scans the frames in your application
+1) **hive-configuration** - a system for laoding configuration from JSON files or modules.
+2) **Hive-component** - a framework for building up a class factory based on configuration and method definitions. Designed  to allow for multiple inputs for both to be mixed into the final definition.
+3) **Hive-model** - A bare-bones "in memory" registry of key/values, used to track apiary resources.
+4) **Hive-loader** - to bootstrap the application from the file system Hive-loader scans the frames in your application
    into your running application ('apiary').
+
+Hive attempts to keep its sturcture as diffuse as possible and in fact each of these systems can be used independantly. But the magic happens when they are mixed in hive-mvc to respond to and define and manage rich web applications. 
 
 Hive is "action centric" - all power is given to the action; you could even hypothetically run an entire site off a
 single action.
 
 The full genus is
 
-APIARY : FRAME : HIVE : ACTION
+`APIARY : FRAME : HIVE : ACTION`
+
+which maps to classical MVC as 
+
+`[framework] : [module] : [controller] [controller method(s)]`
 
 Actions
 -------
@@ -251,7 +254,7 @@ using html files interpreted by ejs. Also, note that hive-mvc internalizes views
 its fine to have/maintain your views folder for raw Express endpoints, you won't need it for hive.
 
 ---------------------
-&ast; While the architecture is designed to allow for multiple apiaries, its never been tested and I couldn't see the
+&#42; While the architecture is designed to allow for multiple apiaries, its never been tested and I couldn't see the
 point.
-&ast;&ast; Hive-model does have quantum-read-write to a file system, and so is good for mocks, but its not built to be
+&#42;&#42; Hive-model does have quantum-read-write to a file system, and so is good for mocks, but its not built to be
 production performant for real world repos.
