@@ -67,12 +67,26 @@ Action configurations must have one or more entries in the routes object as in
 
 </code>
 
-Actions' code is made up of a series of handlers, defined in a [action_name]_actions.js code file:
+Actions' code is made up of a series of handlers, defined in a `[action_name]_actions.js` code file:
 
-ON_VALIDATE, ON_INPUT, ON_PROCESS, ON_OUTPUT
+``` javasccript
 
-There are "hooks" for managing specific stages of a response; you don't have to hand code overrides for each of these
-methods -- for instance, if you have no need for security on a response, you can skip the on_validate hook.
+module.exports = {
+
+// enforce any access limitations; route unauthrozied users or requests with bad sigtnatures elseware
+   on_validate(context, done){ ... },
+// append data from models, file systems, etc. to the context based on request parameters
+   on_input(context, done){ ... },
+// output any data to file systems, modeels, etc., or otherwise reconcile the request input with data pulled in during the input phase
+   on_process(context, done){ ... },
+// post-process data in a form that the view templates/rest API desires. 
+   on_output(context, done){ ... }
+
+```
+
+There are "hooks" for managing specific stages of a response. The reason they are so numerous is to reduce as much as possible the risk of callback spaghetti. 
+
+You don't have to hand code overrides for every one (or ANY) of these methods -- for instance, if you have no need for security on a response, you can skip the `on_validate` hook.
 
 each of these methods have the following signatures:
 
@@ -84,8 +98,6 @@ on_[method](ctx, callback) {
 }
 
 These callbacks are managed by async.waterfall and shouldn't be called directly.
-
-Also, you can define your own action pipeline by overriding the pipe property of the action (see action/respond.js).
 
 Context
 -------
@@ -152,14 +164,23 @@ with a name is a legitimate resource. Given that the apiary itself can be config
 et.al, and has the dataspace this function is a good place to transport this information into models and other
 utilities.
 
+### Models 
 
+Models are "meta-resources" -- they don't define APIs into any particular data store, as much as encapsulate your custom code for doing so in a named hook. 
+
+### View Helpers
+
+View helpers "Pipe" the rendered output through a series of functions that selectively activate and pre-process data from the views' output manifest. They are the equivalent of Ruby's `after` hooks. They do *not* apply themselves to REST/raw JSON output. They trigger between `on_output` and the template rendering (EJS) stage of the request.
+
+### Mixins
+
+Mixins are executed once when the application boots. They are a way to insert any number of "state checking/initialization" routines into your application, especially those sort of actions that are specific and local to the needs of a particular Hive, Action or Frame. They have a weight that govens their load order. 
 
 Hive and Express
 ================
 
-Where nuby-express internalized the express app, in hive, the assumption is you already have an express application,
-and you are looking to scale and better organize it. So hive wraps itself around an existing application, using the app
-and server as resources of the apiary. The apiary is the top level singleton of your site.*
+In Hive, the assumption is you already have an express application, and you are looking to scale and better organize it. So hive wraps itself around an existing application, using the app and server as resources of the apiary. 
+The apiary is the top level singleton of your site that is instantiated after the Express app has connected.*
 
 Here is a typical bootstrap file with express and hive-mvc working in concert:
 
@@ -230,7 +251,7 @@ using html files interpreted by ejs. Also, note that hive-mvc internalizes views
 its fine to have/maintain your views folder for raw Express endpoints, you won't need it for hive.
 
 ---------------------
-* While the architecture is designed to allow for multiple apiaries, its never been tested and I couldn't see the
+&ast; While the architecture is designed to allow for multiple apiaries, its never been tested and I couldn't see the
 point.
-** Hive-model does have quantum-read-write to a file system, and so is good for mocks, but its not built to be
+&ast;&ast; Hive-model does have quantum-read-write to a file system, and so is good for mocks, but its not built to be
 production performant for real world repos.
